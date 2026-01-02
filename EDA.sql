@@ -1,6 +1,5 @@
 SELECT *  FROM hechos_ventas;
-
-
+-- Visualiza la tabla de ventas
 SELECT 
 	 fecha ,REPLACE(fecha,'-','/') AS NEW_FORMAT
 FROM dim_fecha;
@@ -10,20 +9,15 @@ SELECT * from dim_fecha df ;
 SELECT cliente_id ,producto_id , cantidad ,total_venta  FROM hechos_ventas ORDER BY total_venta DESC LIMIT 3;
 --Las 3 mejores ventas y añde la información que resulta útil
 
-
-SELECT * FROM hechos_ventas WHERE cliente_id=2;
-
-
-
 SELECT cliente_id ,COUNT(DISTINCT id_venta ) AS 'COMPRAS' FROM hechos_ventas GROUP BY cliente_id ORDER BY COMPRAS DESC;
--- Muestra el cliente con más compras realizadas
+-- Cuales son los clientes con más compras realizadas?
 /*
 SELECT cliente_id ,COUNT(*) AS 'COMPRAS' FROM hechos_ventas GROUP BY cliente_id RDER BY COMPRAS DESC;
  --Esta intrucción muestra el mismo resultado
 */
 
 SELECT producto_id  ,COUNT(*) AS PRODUCTO_MAS_VENDIDO FROM hechos_ventas GROUP BY producto_id ORDER BY PRODUCTO_MAS_VENDIDO DESC;
--- Muestra los productos con más ventas
+-- Cuales son los productos mñas vendidos?
 
 /* 
  Si queremos obtener más información acerca del producto o del cliente,
@@ -46,10 +40,10 @@ SELECT F.fecha, strftime('%m', F.fecha ),H.*  FROM hechos_ventas H
 JOIN dim_fecha F ON H.fecha_id = F.fecha_id ORDER BY F.fecha DESC;
  ---Las ventas más recientes
 
---LEFT JOIN con dim_fecha
+--LEFT JOIN con dim_producto
 SELECT P.*, H.*  FROM hechos_ventas H
 RIGHT JOIN dim_producto P ON H.producto_id  = P.producto_id WHERE H.id_venta IS NULL ; 
---Cuales son los productos que no se han vendido
+--Cuales son los productos que NO se han vendido?
 /*
 SELECT P.*, H.*  FROM dim_producto P
 LEFT JOIN hechos_ventas H ON P.producto_id= H.producto_id WHERE H.id_venta IS NULL ;
@@ -64,7 +58,7 @@ JOIN dim_fecha F ON H.fecha_id = F.fecha_id GROUP BY anio ;
 
 SELECT F.nombre_mes ,SUM(H.total_venta ) AS VENTAS_POR_MES   FROM hechos_ventas H 
 JOIN dim_fecha F ON H.fecha_id = F.fecha_id GROUP BY F.mes ORDER BY VENTAS_POR_MES DESC LIMIT 3;
--- Cual son los tres mejores con mayor facturación
+-- Cuales son los 3 meses con mayor facturación?
 
 
 SELECT T.nombre_tienda , SUM(cantidad) AS PRODUCTOS_VENDIDOS  FROM hechos_ventas H
@@ -139,7 +133,7 @@ SELECT * FROM vista_ventas_basica WHERE ciudad= 'Barcelona';
 
 
 
----CTE no se puede ejecutar por si mismo, debo añdir despues el select * from cliente_cte
+---CTE ANIDADAS
 WITH clientes_cte AS (
     SELECT
         cliente_id,
@@ -156,7 +150,6 @@ maxima_edad_cte AS (
     FROM dim_cliente
 )
 
-
 /*
  * CTE anidadas utilizadas en la consulta:
  *
@@ -168,8 +161,6 @@ maxima_edad_cte AS (
  *    - Calcula la edad máxima existente entre todos los registros
  *      de la tabla de clientes.
  */
-
-
 SELECT *
 FROM clientes_cte 
 WHERE edad= (SELECT * FROM maxima_edad_cte );
